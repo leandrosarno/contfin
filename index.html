@@ -143,27 +143,18 @@
             border: 1px solid #aaa; border-radius: 0; box-sizing: border-box; font-size: 11px;
         }
 
-        /* CONFIGURAÇÃO DO BOTÃO DO OLHO NA SENHA */
         .password-wrapper {
             position: relative;
-            margin: 4px 0 8px 0; /* Substitui a margem do input */
+            margin: 4px 0 8px 0;
         }
         .password-wrapper input {
-            margin: 0; /* Remove a margem original para o wrapper assumir */
-            padding-right: 28px; /* Abre espaço para o ícone não sobrepor o texto */
+            margin: 0; 
+            padding-right: 28px;
         }
         .btn-eye {
-            position: absolute;
-            right: 4px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            color: #666;
-            cursor: pointer;
-            padding: 2px;
-            display: flex;
-            align-items: center;
+            position: absolute; right: 4px; top: 50%; transform: translateY(-50%);
+            background: none; border: none; color: #666; cursor: pointer; padding: 2px;
+            display: flex; align-items: center;
         }
         .btn-eye:hover { color: var(--google-blue); }
         .btn-eye .material-icons { font-size: 14px; }
@@ -176,6 +167,8 @@
         .btn-azul:hover { background-color: #1557b0; }
         .btn-verde { background-color: var(--google-green); border-color: #0d5321; }
         .btn-verde:hover { background-color: #116529; }
+        .btn-alerta { background-color: #d93025; border-color: #a50e0e; }
+        .btn-alerta:hover { background-color: #b3261e; }
         .btn-cancelar { 
             margin-top: 6px; background: #e0e0e0; border: 1px solid #aaa; 
             color: #333; cursor: pointer; font-size: 11px; width: 100%; padding: 4px 10px;
@@ -220,7 +213,6 @@
     </div>
 
     <div class="app-layout">
-        
         <!-- BARRA LATERAL -->
         <div class="sidebar only-logged-in" id="sidebar">
             <div class="menu-item" onclick="mudarSecao('sis-dashboard')">
@@ -238,21 +230,19 @@
         </div>
 
         <div class="main-content">
-            
-            <!-- TELA INICIAL (PÚBLICA) -->
+            <!-- TELA INICIAL PÚBLICA -->
             <div id="sec-site-home" class="secao-view only-logged-out">
                 <div class="card" style="border-left: 4px solid var(--google-blue);">
-                    <h2 style="border: none; margin-bottom: 5px; color: var(--google-blue);">Bem-vindo ao SIG-EDU & PRTF</h2>
-                    <p style="margin: 0;">Plataforma oficial da Prefeitura. Utilize as ferramentas abaixo para se informar, ou clique em <b>Entrar no Sistema</b> para acessar o painel da sua escola.</p>
+                    <h2 style="border: none; margin-bottom: 5px; color: var(--google-blue);">Portal LS-Sistemas</h2>
+                    <p style="margin: 0;">Utilize as ferramentas abaixo para se informar, ou clique em <b>Entrar no Sistema</b> para acessar o painel.</p>
                 </div>
-
                 <div class="grid-portal">
                     <div class="card">
                         <h2>Blog e Notícias</h2>
                         <div class="blog-post">
-                            <div class="post-titulo">Prazos de Prestação de Contas (PRTF)</div>
-                            <div class="post-data">11/09/2026 - Coordenação</div>
-                            <p class="post-resumo">O sistema encontra-se aberto para lançamentos referentes ao 3º Bimestre.</p>
+                            <div class="post-titulo">Prazos</div>
+                            <div class="post-data">11/09/2026 - </div>
+                            <p class="post-resumo">TESTE DE BLOG</p>
                         </div>
                     </div>
                     <div>
@@ -267,32 +257,26 @@
                 </div>
             </div>
 
-            <!-- TELAS DO SISTEMA (PRIVADAS) -->
+            <!-- TELAS PRIVADAS -->
             <div id="sec-sis-dashboard" class="secao-view only-logged-in" style="display: none;">
                 <div class="card">
                     <h2 style="color: #0d47a1;">Resumo Operacional</h2>
                     <p style="margin: 0;">Gestão ativada. Utilize a barra lateral à esquerda para navegar pelas rotinas financeiras.</p>
                 </div>
             </div>
-            
             <div id="sec-sis-lancamentos" class="secao-view only-logged-in" style="display: none;">
                 <div class="card">
                     <h2>Entrada de Notas e Comprovantes</h2>
-                    <p style="margin: 0;">Tela reservada para cadastro de Receitas e Despesas.</p>
                 </div>
             </div>
-            
             <div id="sec-sis-custos" class="secao-view only-logged-in" style="display: none;">
                 <div class="card">
                     <h2>Controle Financeiro Interno</h2>
-                    <p style="margin: 0;">Lançamentos de recursos próprios (não governamentais).</p>
                 </div>
             </div>
-            
             <div id="sec-sis-relatorios" class="secao-view only-logged-in" style="display: none;">
                 <div class="card">
                     <h2>Emissão de Documentos</h2>
-                    <p style="margin: 0;">Geração de extratos para assinatura e arquivamento.</p>
                 </div>
             </div>
         </div>
@@ -316,11 +300,36 @@
                 </button>
             </div>
             
-            <button class="btn-acao btn-azul" onclick="executarLogin()">Conectar</button>
+            <button class="btn-acao btn-azul" id="btn-login" onclick="executarLogin()">Conectar</button>
+            
+            <div class="link-auxiliar" style="margin-top: 6px;">
+                <button onclick="alternarParaRecuperacao()" style="font-weight: normal;">Esqueci minha senha</button>
+            </div>
+            
             <button class="btn-cancelar" onclick="fecharModais()">Cancelar</button>
             
-            <div class="link-auxiliar">
+            <div class="link-auxiliar" style="border-top: 1px solid #ccc; padding-top: 8px; margin-top: 10px;">
                 Sem acesso? <button onclick="alternarParaCadastro()">Cadastrar novo usuário</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE RECUPERAÇÃO DE SENHA -->
+    <div id="modal-recuperar" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-header" style="background-color: #abd0f2;">
+                <span class="material-icons" style="font-size: 13px; margin-right: 4px;">lock_reset</span> Recuperar Acesso
+            </div>
+            
+            <p style="font-size: 10px; text-align: left; margin-top: 0;">Informe o e-mail cadastrado. Suas credenciais serão enviadas para a sua caixa de entrada.</p>
+            
+            <label style="font-size: 10px; font-weight: bold; display: block; text-align: left;">E-mail:</label>
+            <input type="email" id="recuperar-email">
+            
+            <button class="btn-acao btn-alerta" id="btn-recuperar" onclick="executarRecuperacao()">Enviar Senha</button>
+            
+            <div class="link-auxiliar">
+                <button onclick="alternarParaLogin()">Voltar para a tela de Login</button>
             </div>
         </div>
     </div>
@@ -333,6 +342,7 @@
             </div>
             
             <input type="text" id="cad-nome" placeholder="Nome Completo (Obrigatório)" required>
+            <input type="email" id="cad-email" placeholder="E-mail (Para recuperação)" required>
             <input type="text" id="cad-unidade" placeholder="Setor / Unidade Escolar">
             
             <div class="password-wrapper">
@@ -360,16 +370,22 @@
     </div>
 
     <script>
+        // ======= CONFIGURAÇÃO DA API =======
+        // Cole aqui a URL gerada pelo Google Apps Script
+        const urlAPI = "SUA_URL_DO_APPS_SCRIPT_AQUI"; 
+
         function toggleMenu() { document.getElementById('sidebar').classList.toggle('collapsed'); }
         function abrirModal(id) { document.getElementById(id).style.display = 'flex'; }
         
         function fecharModais() {
             document.getElementById('modal-login').style.display = 'none';
             document.getElementById('modal-cadastro').style.display = 'none';
+            document.getElementById('modal-recuperar').style.display = 'none';
         }
 
         function alternarParaCadastro() { fecharModais(); abrirModal('modal-cadastro'); }
         function alternarParaLogin() { fecharModais(); abrirModal('modal-login'); }
+        function alternarParaRecuperacao() { fecharModais(); abrirModal('modal-recuperar'); }
 
         function mudarSecao(idAlvo) {
             var secoes = document.querySelectorAll('.secao-view');
@@ -378,11 +394,9 @@
             if(alvo) { alvo.style.display = 'block'; }
         }
 
-        /* FUNÇÃO NOVA: Revelar / Ocultar Senha */
         function toggleSenha(inputId, btn) {
             var input = document.getElementById(inputId);
             var icon = btn.querySelector('.material-icons');
-            
             if (input.type === "password") {
                 input.type = "text";
                 icon.innerText = "visibility";
@@ -395,14 +409,12 @@
         function checarForcaSenha() {
             var senha = document.getElementById('cad-senha').value;
             var box = document.getElementById('forca-senha');
-            
             var temNum = /\d/.test(senha);
             var temLetra = /[a-zA-Z]/.test(senha);
-            var tamanhoOk = senha.length >= 6;
-
+            
             if(senha.length === 0) {
                 box.innerText = "";
-            } else if(!tamanhoOk || !temNum || !temLetra) {
+            } else if(senha.length < 6 || !temNum || !temLetra) {
                 box.style.color = "#d93025";
                 box.innerText = "Requisito: Min. 6 caracteres (letras e números).";
             } else {
@@ -411,70 +423,98 @@
             }
         }
 
+        // ======= ROTINA DE CADASTRO (Apenas simulação visual por enquanto) =======
         function executarCadastro() {
             var nome = document.getElementById('cad-nome').value;
             var senha = document.getElementById('cad-senha').value;
             var conf = document.getElementById('cad-senha-confirma').value;
+            var email = document.getElementById('cad-email').value;
 
-            if(nome === "" || senha === "" || conf === "") {
-                alert("Erro: Preenchimento incompleto.");
+            if(nome === "" || senha === "" || conf === "" || email === "") {
+                alert("Erro: Preenchimento obrigatório incompleto.");
                 return;
             }
             if(senha !== conf) {
                 alert("Erro: As senhas não coincidem.");
                 return;
             }
-
-            alert("Sucesso: Usuário " + nome + " cadastrado.");
+            alert("Simulação: Usuário " + nome + " seria cadastrado no banco.");
             alternarParaLogin();
         }
 
-function executarLogin() {
-    var usuario = document.getElementById('login-usuario').value;
-    var senha = document.getElementById('login-senha').value;
-
-    if(usuario === "" || senha === "") {
-        alert("Atenção: Credenciais em branco.");
-        return;
-    }
-
-    // Cole a URL gigante do Apps Script aqui dentro das aspas:
-    var urlAPI = "COLE_SUA_URL_AQUI";
-    
-    // Opcional: Mostra que está carregando (feedback visual)
-    document.querySelector('.btn-azul').innerText = "Conectando...";
-
-    fetch(urlAPI + "?usuario=" + usuario + "&senha=" + senha)
-        .then(resposta => resposta.json())
-        .then(dados => {
-            document.querySelector('.btn-azul').innerText = "Conectar"; // Volta o texto original
+        // ======= ROTINA DE RECUPERAÇÃO VIA FETCH =======
+        function executarRecuperacao() {
+            var email = document.getElementById('recuperar-email').value;
             
-            if(dados.status === "sucesso") {
-                fecharModais();
-                document.body.classList.remove('logged-out');
-                document.body.classList.add('logged-in');
-                
-                // Agora o nome que aparece na barra vem direto da sua planilha!
-                document.getElementById('label-nome-gestor').innerText = dados.nome; 
-                document.getElementById('painel-subtitulo').innerText = '| Ambiente Seguro';
-                
-                // Podemos guardar o ID_USUARIO oculto no navegador para os lançamentos futuros
-                localStorage.setItem('idGestorLogado', dados.id);
-                
-                mudarSecao('sis-dashboard');
-            } else {
-                alert("Usuário ou senha incorretos. Tente novamente.");
+            if(email === "") {
+                alert("Informe o e-mail para recuperar a senha.");
+                return;
             }
-        })
-        .catch(erro => {
-            document.querySelector('.btn-azul').innerText = "Conectar";
-            alert("Erro de conexão com o servidor. Verifique sua internet.");
-        });
-}
+
+            var btn = document.getElementById('btn-recuperar');
+            btn.innerText = "Enviando...";
+
+            fetch(urlAPI + "?acao=recuperar&email=" + encodeURIComponent(email))
+                .then(resposta => resposta.json())
+                .then(dados => {
+                    btn.innerText = "Enviar Senha";
+                    if(dados.status === "enviado") {
+                        alert("As instruções de recuperação foram enviadas para o seu e-mail.");
+                        alternarParaLogin();
+                    } else {
+                        alert("E-mail não localizado no banco de dados.");
+                    }
+                })
+                .catch(erro => {
+                    btn.innerText = "Enviar Senha";
+                    alert("Erro de conexão. Verifique se a URL da API está correta no código.");
+                });
+        }
+
+        // ======= ROTINA DE LOGIN VIA FETCH =======
+        function executarLogin() {
+            var usuario = document.getElementById('login-usuario').value;
+            var senha = document.getElementById('login-senha').value;
+
+            if(usuario === "" || senha === "") {
+                alert("Atenção: Credenciais em branco.");
+                return;
+            }
+
+            var btn = document.getElementById('btn-login');
+            btn.innerText = "Conectando...";
+
+            fetch(urlAPI + "?acao=login&usuario=" + encodeURIComponent(usuario) + "&senha=" + encodeURIComponent(senha))
+                .then(resposta => resposta.json())
+                .then(dados => {
+                    btn.innerText = "Conectar";
+                    if(dados.status === "sucesso") {
+                        fecharModais();
+                        document.body.classList.remove('logged-out');
+                        document.body.classList.add('logged-in');
+                        
+                        document.getElementById('label-nome-gestor').innerText = dados.nome;
+                        document.getElementById('painel-subtitulo').innerText = '| Ambiente Seguro';
+                        
+                        // Guarda o ID do gestor no navegador para gravar os lançamentos futuros
+                        localStorage.setItem('idGestorLogado', dados.id);
+                        
+                        mudarSecao('sis-dashboard');
+                    } else {
+                        alert("Usuário ou senha incorretos.");
+                    }
+                })
+                .catch(erro => {
+                    btn.innerText = "Conectar";
+                    alert("Erro de conexão. Verifique se a URL da API está correta no código.");
+                });
+        }
+
         function fazerLogout() {
             document.body.classList.remove('logged-in');
             document.body.classList.add('logged-out');
             document.getElementById('painel-subtitulo').innerText = '| Portal Institucional';
+            localStorage.removeItem('idGestorLogado');
             mudarSecao('site-home');
         }
     </script>
