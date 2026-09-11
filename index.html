@@ -9,19 +9,19 @@
     
     <style>
         :root {
-            --topbar-height: 32px; /* Barra superior ainda mais fina (estilo software) */
+            --topbar-height: 32px;
             --sidebar-width: 180px;
             --sidebar-collapsed-width: 40px;
             --google-blue: #1a73e8;
             --google-green: #188038;
-            --border-color: #ccc; /* Borda mais marcada, padrão desktop */
+            --border-color: #ccc;
             --bg-color: #eef0f3;
         }
 
         body {
             margin: 0;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            font-size: 11px; /* Fonte bem compacta para monitores pequenos */
+            font-size: 11px;
             background-color: var(--bg-color);
             color: #333;
             overflow: hidden;
@@ -42,7 +42,7 @@
 
         .icon-btn {
             background: none; border: 1px solid transparent; color: #555;
-            cursor: pointer; padding: 2px 4px; border-radius: 0; /* Zero cantos arredondados */
+            cursor: pointer; padding: 2px 4px; border-radius: 0;
             display: flex; align-items: center; justify-content: center;
             margin-right: 5px; height: 24px;
         }
@@ -57,7 +57,7 @@
 
         .btn-top {
             display: flex; align-items: center; border: 1px solid #ccc; 
-            padding: 0 10px; border-radius: 0; /* Zero cantos arredondados */
+            padding: 0 10px; border-radius: 0;
             cursor: pointer; font-weight: bold; font-size: 11px; height: 24px;
         }
         .btn-top .material-icons { font-size: 13px; margin-right: 4px; }
@@ -70,7 +70,7 @@
             height: calc(100vh - var(--topbar-height));
         }
 
-        /* BARRA LATERAL (Apenas logado) */
+        /* BARRA LATERAL */
         .sidebar {
             width: var(--sidebar-width);
             background-color: white;
@@ -84,7 +84,7 @@
         .menu-item {
             display: flex; align-items: center;
             padding: 6px 0; color: #333; text-decoration: none;
-            cursor: pointer; border-radius: 0; /* Quadrado */
+            cursor: pointer; border-radius: 0;
             white-space: nowrap; border-bottom: 1px solid #f0f0f0;
         }
         .menu-item:hover { background-color: #e5e5e5; }
@@ -107,7 +107,7 @@
         
         .card { 
             background: white; border: 1px solid var(--border-color); 
-            border-radius: 0; /* Estilo janela clássica */
+            border-radius: 0;
             padding: 12px; margin-bottom: 10px; box-shadow: 1px 1px 3px rgba(0,0,0,0.05);
         }
         .card h2 { 
@@ -116,19 +116,14 @@
         }
 
         /* GRID DA TELA INICIAL PÚBLICA */
-        .grid-portal {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 10px;
-        }
-
+        .grid-portal { display: grid; grid-template-columns: 2fr 1fr; gap: 10px; }
         .blog-post { margin-bottom: 12px; border-bottom: 1px dashed var(--border-color); padding-bottom: 8px; }
         .blog-post:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
         .post-titulo { font-weight: bold; color: var(--google-blue); font-size: 12px; }
         .post-data { font-size: 9px; color: #777; margin-bottom: 4px; }
         .post-resumo { margin: 0; color: #444; font-size: 11px; }
 
-        /* MODAIS FLUTUANTES (Janelas de Sistema) */
+        /* MODAIS FLUTUANTES */
         .modal-overlay {
             display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             background-color: rgba(0,0,0,0.4); z-index: 2000;
@@ -138,7 +133,6 @@
             background: #f0f0f0; padding: 12px; border: 1px solid #999; border-radius: 0;
             width: 260px; box-shadow: 2px 2px 10px rgba(0,0,0,0.3);
         }
-        /* Barra de título do modal imitando sistema operacional */
         .modal-header {
             background-color: var(--google-blue); color: white;
             padding: 4px 8px; font-weight: bold; font-size: 11px;
@@ -148,6 +142,31 @@
             width: 100%; padding: 4px 6px; margin: 4px 0 8px 0;
             border: 1px solid #aaa; border-radius: 0; box-sizing: border-box; font-size: 11px;
         }
+
+        /* CONFIGURAÇÃO DO BOTÃO DO OLHO NA SENHA */
+        .password-wrapper {
+            position: relative;
+            margin: 4px 0 8px 0; /* Substitui a margem do input */
+        }
+        .password-wrapper input {
+            margin: 0; /* Remove a margem original para o wrapper assumir */
+            padding-right: 28px; /* Abre espaço para o ícone não sobrepor o texto */
+        }
+        .btn-eye {
+            position: absolute;
+            right: 4px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            padding: 2px;
+            display: flex;
+            align-items: center;
+        }
+        .btn-eye:hover { color: var(--google-blue); }
+        .btn-eye .material-icons { font-size: 14px; }
         
         .btn-acao {
             color: white; border: 1px solid #666; padding: 4px 10px;
@@ -179,7 +198,6 @@
 
     <!-- BARRA SUPERIOR -->
     <div class="topbar">
-        <!-- O botão de menu lateral SÓ existe se estiver logado -->
         <button class="icon-btn only-logged-in" onclick="toggleMenu()" title="Expandir/Recolher Menu">
             <span class="material-icons" style="font-size: 16px;">menu</span>
         </button>
@@ -190,24 +208,20 @@
         </div>
         
         <div class="topbar-right">
-            <!-- Botão Entrar (Apenas site) -->
             <button class="btn-top btn-entrar only-logged-out" onclick="abrirModal('modal-login')">
                 <span class="material-icons">lock</span> Entrar no Sistema
             </button>
             
-            <!-- Perfil do Gestor (Apenas logado) -->
             <div class="only-logged-in" style="display: flex; align-items: center; gap: 6px;">
                 <span id="label-nome-gestor" style="font-weight: bold; font-size: 11px;">Gestor</span>
-                <button class="btn-top" onclick="fazerLogout()" title="Sair" style="background: #e0e0e0; color: #333;">
-                    Sair
-                </button>
+                <button class="btn-top" onclick="fazerLogout()" title="Sair" style="background: #e0e0e0; color: #333;">Sair</button>
             </div>
         </div>
     </div>
 
     <div class="app-layout">
         
-        <!-- BARRA LATERAL (Exclusiva do Sistema) -->
+        <!-- BARRA LATERAL -->
         <div class="sidebar only-logged-in" id="sidebar">
             <div class="menu-item" onclick="mudarSecao('sis-dashboard')">
                 <span class="material-icons">dashboard</span><span class="menu-text">Painel Geral</span>
@@ -225,86 +239,66 @@
 
         <div class="main-content">
             
-            <!-- ================= TELA INICIAL (PÚBLICA) ================= -->
-            
+            <!-- TELA INICIAL (PÚBLICA) -->
             <div id="sec-site-home" class="secao-view only-logged-out">
-                
                 <div class="card" style="border-left: 4px solid var(--google-blue);">
                     <h2 style="border: none; margin-bottom: 5px; color: var(--google-blue);">Bem-vindo ao SIG-EDU & PRTF</h2>
-                    <p style="margin: 0;">Plataforma oficial da Prefeitura. Utilize as ferramentas abaixo para se informar, ou clique em <b>Entrar no Sistema</b> (no topo direito) para acessar o painel da sua escola.</p>
+                    <p style="margin: 0;">Plataforma oficial da Prefeitura. Utilize as ferramentas abaixo para se informar, ou clique em <b>Entrar no Sistema</b> para acessar o painel da sua escola.</p>
                 </div>
 
                 <div class="grid-portal">
-                    <!-- Coluna da Esquerda: Blog -->
                     <div class="card">
                         <h2>Blog e Notícias</h2>
-                        
                         <div class="blog-post">
                             <div class="post-titulo">Prazos de Prestação de Contas (PRTF)</div>
                             <div class="post-data">11/09/2026 - Coordenação</div>
-                            <p class="post-resumo">O sistema encontra-se aberto para lançamentos referentes ao 3º Bimestre. Fique atento ao cronograma final de fechamento das planilhas.</p>
-                        </div>
-
-                        <div class="blog-post">
-                            <div class="post-titulo">Atualização do Módulo de Custos</div>
-                            <div class="post-data">05/09/2026 - T.I.</div>
-                            <p class="post-resumo">Nova funcionalidade permite que a unidade escolar controle suas despesas internas de forma independente da verba oficial.</p>
+                            <p class="post-resumo">O sistema encontra-se aberto para lançamentos referentes ao 3º Bimestre.</p>
                         </div>
                     </div>
-
-                    <!-- Coluna da Direita: Manuais -->
                     <div>
                         <div class="card">
                             <h2>Manuais e Dicas</h2>
                             <ul style="margin: 0; padding-left: 15px; font-size: 11px; color: var(--google-blue);">
-                                <li style="margin-bottom: 4px;"><a href="#" style="color: inherit; text-decoration: none;">Guia de Uso do Sistema (PDF)</a></li>
-                                <li style="margin-bottom: 4px;"><a href="#" style="color: inherit; text-decoration: none;">Modelo de Recibos Padronizados</a></li>
+                                <li><a href="#" style="color: inherit; text-decoration: none;">Guia de Uso do Sistema (PDF)</a></li>
                                 <li><a href="#" style="color: inherit; text-decoration: none;">Cartilha de Despesas Permitidas</a></li>
                             </ul>
-                        </div>
-                        
-                        <div class="card">
-                            <h2>Suporte Técnico</h2>
-                            <p style="margin: 0; font-size: 11px;">Em caso de dúvidas com o seu login, contate o setor de T.I. através do ramal 1234.</p>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- ================= TELAS DO SISTEMA (PRIVADAS) ================= -->
-
+            <!-- TELAS DO SISTEMA (PRIVADAS) -->
             <div id="sec-sis-dashboard" class="secao-view only-logged-in" style="display: none;">
                 <div class="card">
                     <h2 style="color: #0d47a1;">Resumo Operacional</h2>
                     <p style="margin: 0;">Gestão ativada. Utilize a barra lateral à esquerda para navegar pelas rotinas financeiras.</p>
                 </div>
             </div>
-
+            
             <div id="sec-sis-lancamentos" class="secao-view only-logged-in" style="display: none;">
                 <div class="card">
                     <h2>Entrada de Notas e Comprovantes</h2>
                     <p style="margin: 0;">Tela reservada para cadastro de Receitas e Despesas.</p>
                 </div>
             </div>
-
+            
             <div id="sec-sis-custos" class="secao-view only-logged-in" style="display: none;">
                 <div class="card">
                     <h2>Controle Financeiro Interno</h2>
                     <p style="margin: 0;">Lançamentos de recursos próprios (não governamentais).</p>
                 </div>
             </div>
-
+            
             <div id="sec-sis-relatorios" class="secao-view only-logged-in" style="display: none;">
                 <div class="card">
                     <h2>Emissão de Documentos</h2>
                     <p style="margin: 0;">Geração de extratos para assinatura e arquivamento.</p>
                 </div>
             </div>
-
         </div>
     </div>
 
-    <!-- ================= MODAIS (JANELAS) ================= -->
+    <!-- MODAL DE LOGIN -->
     <div id="modal-login" class="modal-overlay">
         <div class="modal-box">
             <div class="modal-header">
@@ -315,7 +309,12 @@
             <input type="text" id="login-usuario">
             
             <label style="font-size: 10px; font-weight: bold; display: block; text-align: left;">Senha:</label>
-            <input type="password" id="login-senha">
+            <div class="password-wrapper">
+                <input type="password" id="login-senha">
+                <button class="btn-eye" onclick="toggleSenha('login-senha', this)" title="Mostrar/Ocultar Senha">
+                    <span class="material-icons">visibility_off</span>
+                </button>
+            </div>
             
             <button class="btn-acao btn-azul" onclick="executarLogin()">Conectar</button>
             <button class="btn-cancelar" onclick="fecharModais()">Cancelar</button>
@@ -326,6 +325,7 @@
         </div>
     </div>
 
+    <!-- MODAL DE CADASTRO -->
     <div id="modal-cadastro" class="modal-overlay">
         <div class="modal-box">
             <div class="modal-header" style="background-color: var(--google-green);">
@@ -335,10 +335,20 @@
             <input type="text" id="cad-nome" placeholder="Nome Completo (Obrigatório)" required>
             <input type="text" id="cad-unidade" placeholder="Setor / Unidade Escolar">
             
-            <input type="password" id="cad-senha" placeholder="Definir Senha" onkeyup="checarForcaSenha()" required>
+            <div class="password-wrapper">
+                <input type="password" id="cad-senha" placeholder="Definir Senha" onkeyup="checarForcaSenha()" required>
+                <button class="btn-eye" onclick="toggleSenha('cad-senha', this)" title="Mostrar/Ocultar Senha">
+                    <span class="material-icons">visibility_off</span>
+                </button>
+            </div>
             <div id="forca-senha"></div>
             
-            <input type="password" id="cad-senha-confirma" placeholder="Confirmar Senha" required>
+            <div class="password-wrapper">
+                <input type="password" id="cad-senha-confirma" placeholder="Confirmar Senha" required>
+                <button class="btn-eye" onclick="toggleSenha('cad-senha-confirma', this)" title="Mostrar/Ocultar Senha">
+                    <span class="material-icons">visibility_off</span>
+                </button>
+            </div>
             
             <button class="btn-acao btn-verde" onclick="executarCadastro()">Gravar Registro</button>
             <button class="btn-cancelar" onclick="fecharModais()">Cancelar</button>
@@ -350,34 +360,36 @@
     </div>
 
     <script>
-        function toggleMenu() {
-            document.getElementById('sidebar').classList.toggle('collapsed');
-        }
-
-        function abrirModal(id) {
-            document.getElementById(id).style.display = 'flex';
-        }
-
+        function toggleMenu() { document.getElementById('sidebar').classList.toggle('collapsed'); }
+        function abrirModal(id) { document.getElementById(id).style.display = 'flex'; }
+        
         function fecharModais() {
             document.getElementById('modal-login').style.display = 'none';
             document.getElementById('modal-cadastro').style.display = 'none';
         }
 
-        function alternarParaCadastro() {
-            fecharModais();
-            abrirModal('modal-cadastro');
-        }
-
-        function alternarParaLogin() {
-            fecharModais();
-            abrirModal('modal-login');
-        }
+        function alternarParaCadastro() { fecharModais(); abrirModal('modal-cadastro'); }
+        function alternarParaLogin() { fecharModais(); abrirModal('modal-login'); }
 
         function mudarSecao(idAlvo) {
             var secoes = document.querySelectorAll('.secao-view');
             secoes.forEach(function(s) { s.style.display = 'none'; });
             var alvo = document.getElementById('sec-' + idAlvo);
             if(alvo) { alvo.style.display = 'block'; }
+        }
+
+        /* FUNÇÃO NOVA: Revelar / Ocultar Senha */
+        function toggleSenha(inputId, btn) {
+            var input = document.getElementById(inputId);
+            var icon = btn.querySelector('.material-icons');
+            
+            if (input.type === "password") {
+                input.type = "text";
+                icon.innerText = "visibility";
+            } else {
+                input.type = "password";
+                icon.innerText = "visibility_off";
+            }
         }
 
         function checarForcaSenha() {
@@ -408,7 +420,6 @@
                 alert("Erro: Preenchimento incompleto.");
                 return;
             }
-
             if(senha !== conf) {
                 alert("Erro: As senhas não coincidem.");
                 return;
@@ -428,11 +439,8 @@
             fecharModais();
             document.body.classList.remove('logged-out');
             document.body.classList.add('logged-in');
-
             document.getElementById('label-nome-gestor').innerText = usuario;
             document.getElementById('painel-subtitulo').innerText = '| Ambiente Seguro';
-
-            // O sistema automaticamente oculta o painel público e abre o Dashboard
             mudarSecao('sis-dashboard');
         }
 
@@ -440,8 +448,6 @@
             document.body.classList.remove('logged-in');
             document.body.classList.add('logged-out');
             document.getElementById('painel-subtitulo').innerText = '| Portal Institucional';
-            
-            // Retorna imediatamente para a tela da grade de portal/blog
             mudarSecao('site-home');
         }
     </script>
