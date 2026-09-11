@@ -429,21 +429,48 @@
             alternarParaLogin();
         }
 
-        function executarLogin() {
-            var usuario = document.getElementById('login-usuario').value;
-            if(usuario === "") {
-                alert("Atenção: Credenciais em branco.");
-                return;
+function executarLogin() {
+    var usuario = document.getElementById('login-usuario').value;
+    var senha = document.getElementById('login-senha').value;
+
+    if(usuario === "" || senha === "") {
+        alert("Atenção: Credenciais em branco.");
+        return;
+    }
+
+    // Cole a URL gigante do Apps Script aqui dentro das aspas:
+    var urlAPI = "COLE_SUA_URL_AQUI";
+    
+    // Opcional: Mostra que está carregando (feedback visual)
+    document.querySelector('.btn-azul').innerText = "Conectando...";
+
+    fetch(urlAPI + "?usuario=" + usuario + "&senha=" + senha)
+        .then(resposta => resposta.json())
+        .then(dados => {
+            document.querySelector('.btn-azul').innerText = "Conectar"; // Volta o texto original
+            
+            if(dados.status === "sucesso") {
+                fecharModais();
+                document.body.classList.remove('logged-out');
+                document.body.classList.add('logged-in');
+                
+                // Agora o nome que aparece na barra vem direto da sua planilha!
+                document.getElementById('label-nome-gestor').innerText = dados.nome; 
+                document.getElementById('painel-subtitulo').innerText = '| Ambiente Seguro';
+                
+                // Podemos guardar o ID_USUARIO oculto no navegador para os lançamentos futuros
+                localStorage.setItem('idGestorLogado', dados.id);
+                
+                mudarSecao('sis-dashboard');
+            } else {
+                alert("Usuário ou senha incorretos. Tente novamente.");
             }
-
-            fecharModais();
-            document.body.classList.remove('logged-out');
-            document.body.classList.add('logged-in');
-            document.getElementById('label-nome-gestor').innerText = usuario;
-            document.getElementById('painel-subtitulo').innerText = '| Ambiente Seguro';
-            mudarSecao('sis-dashboard');
-        }
-
+        })
+        .catch(erro => {
+            document.querySelector('.btn-azul').innerText = "Conectar";
+            alert("Erro de conexão com o servidor. Verifique sua internet.");
+        });
+}
         function fazerLogout() {
             document.body.classList.remove('logged-in');
             document.body.classList.add('logged-out');
