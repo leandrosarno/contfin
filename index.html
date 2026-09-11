@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LS SISTEMAS</title>
+    <title>SIG-EDU | PRTF e Gestão</title>
     
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     
@@ -123,7 +123,7 @@
         .post-data { font-size: 9px; color: #777; margin-bottom: 4px; }
         .post-resumo { margin: 0; color: #444; font-size: 11px; }
 
-        /* MODAIS FLUTUANTES */
+        /* MODAIS FLUTUANTES (Quadradões) */
         .modal-overlay {
             display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             background-color: rgba(0,0,0,0.4); z-index: 2000;
@@ -143,14 +143,9 @@
             border: 1px solid #aaa; border-radius: 0; box-sizing: border-box; font-size: 11px;
         }
 
-        .password-wrapper {
-            position: relative;
-            margin: 4px 0 8px 0;
-        }
-        .password-wrapper input {
-            margin: 0; 
-            padding-right: 28px;
-        }
+        /* CAMPO COM OLHO DA SENHA */
+        .password-wrapper { position: relative; margin: 4px 0 8px 0; }
+        .password-wrapper input { margin: 0; padding-right: 28px; }
         .btn-eye {
             position: absolute; right: 4px; top: 50%; transform: translateY(-50%);
             background: none; border: none; color: #666; cursor: pointer; padding: 2px;
@@ -168,7 +163,7 @@
         .btn-verde { background-color: var(--google-green); border-color: #0d5321; }
         .btn-verde:hover { background-color: #116529; }
         .btn-alerta { background-color: #d93025; border-color: #a50e0e; }
-        .btn-alerta:hover { background-color: #189db2; }
+        .btn-alerta:hover { background-color: #b3261e; }
         .btn-cancelar { 
             margin-top: 6px; background: #e0e0e0; border: 1px solid #aaa; 
             color: #333; cursor: pointer; font-size: 11px; width: 100%; padding: 4px 10px;
@@ -212,8 +207,10 @@
         </div>
     </div>
 
+    <!-- ESTRUTURA PRINCIPAL -->
     <div class="app-layout">
-        <!-- BARRA LATERAL -->
+        
+        <!-- BARRA LATERAL (APENAS SISTEMA) -->
         <div class="sidebar only-logged-in" id="sidebar">
             <div class="menu-item" onclick="mudarSecao('sis-dashboard')">
                 <span class="material-icons">dashboard</span><span class="menu-text">Painel Geral</span>
@@ -229,20 +226,22 @@
             </div>
         </div>
 
+        <!-- CONTEÚDO PRINCIPAL -->
         <div class="main-content">
-            <!-- TELA INICIAL PÚBLICA -->
+            
+            <!-- TELA PÚBLICA -->
             <div id="sec-site-home" class="secao-view only-logged-out">
                 <div class="card" style="border-left: 4px solid var(--google-blue);">
-                    <h2 style="border: none; margin-bottom: 5px; color: var(--google-blue);">Portal LS-Sistemas</h2>
-                    <p style="margin: 0;">Utilize as ferramentas abaixo para se informar, ou clique em <b>Entrar no Sistema</b> para acessar o painel.</p>
+                    <h2 style="border: none; margin-bottom: 5px; color: var(--google-blue);">Bem-vindo ao SIG-EDU & PRTF</h2>
+                    <p style="margin: 0;">Plataforma oficial da Prefeitura. Utilize as ferramentas abaixo para se informar, ou clique em <b>Entrar no Sistema</b> para acessar o painel da sua escola.</p>
                 </div>
                 <div class="grid-portal">
                     <div class="card">
                         <h2>Blog e Notícias</h2>
                         <div class="blog-post">
-                            <div class="post-titulo">Prazos</div>
-                            <div class="post-data">11/09/2026 - </div>
-                            <p class="post-resumo">TESTE DE BLOG</p>
+                            <div class="post-titulo">Prazos de Prestação de Contas (PRTF)</div>
+                            <div class="post-data">11/09/2026 - Coordenação</div>
+                            <p class="post-resumo">O sistema encontra-se aberto para lançamentos referentes ao 3º Bimestre.</p>
                         </div>
                     </div>
                     <div>
@@ -257,23 +256,26 @@
                 </div>
             </div>
 
-            <!-- TELAS PRIVADAS -->
+            <!-- TELAS DO SISTEMA (PRIVADAS) -->
             <div id="sec-sis-dashboard" class="secao-view only-logged-in" style="display: none;">
                 <div class="card">
                     <h2 style="color: #0d47a1;">Resumo Operacional</h2>
                     <p style="margin: 0;">Gestão ativada. Utilize a barra lateral à esquerda para navegar pelas rotinas financeiras.</p>
                 </div>
             </div>
+            
             <div id="sec-sis-lancamentos" class="secao-view only-logged-in" style="display: none;">
                 <div class="card">
                     <h2>Entrada de Notas e Comprovantes</h2>
                 </div>
             </div>
+            
             <div id="sec-sis-custos" class="secao-view only-logged-in" style="display: none;">
                 <div class="card">
                     <h2>Controle Financeiro Interno</h2>
                 </div>
             </div>
+            
             <div id="sec-sis-relatorios" class="secao-view only-logged-in" style="display: none;">
                 <div class="card">
                     <h2>Emissão de Documentos</h2>
@@ -289,7 +291,7 @@
                 <span class="material-icons" style="font-size: 13px; margin-right: 4px;">security</span> Autenticação Requerida
             </div>
             
-            <label style="font-size: 10px; font-weight: bold; display: block; text-align: left;">Usuário:</label>
+            <label style="font-size: 10px; font-weight: bold; display: block; text-align: left;">E-mail ou Usuário:</label>
             <input type="text" id="login-usuario">
             
             <label style="font-size: 10px; font-weight: bold; display: block; text-align: left;">Senha:</label>
@@ -314,20 +316,16 @@
         </div>
     </div>
 
-    <!-- MODAL DE RECUPERAÇÃO DE SENHA -->
+    <!-- MODAL DE RECUPERAÇÃO -->
     <div id="modal-recuperar" class="modal-overlay">
         <div class="modal-box">
-            <div class="modal-header" style="background-color: #189db2;">
+            <div class="modal-header" style="background-color: #d93025;">
                 <span class="material-icons" style="font-size: 13px; margin-right: 4px;">lock_reset</span> Recuperar Acesso
             </div>
-            
             <p style="font-size: 10px; text-align: left; margin-top: 0;">Informe o e-mail cadastrado. Suas credenciais serão enviadas para a sua caixa de entrada.</p>
-            
-            <label style="font-size: 10px; font-weight: bold; display: block; text-align: left;">E-mail:</label>
+            <label style="font-size: 10px; font-weight: bold; display: block; text-align: left;">E-mail do Gestor:</label>
             <input type="email" id="recuperar-email">
-            
             <button class="btn-acao btn-alerta" id="btn-recuperar" onclick="executarRecuperacao()">Enviar Senha</button>
-            
             <div class="link-auxiliar">
                 <button onclick="alternarParaLogin()">Voltar para a tela de Login</button>
             </div>
@@ -341,26 +339,34 @@
                 <span class="material-icons" style="font-size: 13px; margin-right: 4px;">person_add</span> Registro de Sistema
             </div>
             
-            <input type="text" id="cad-nome" placeholder="Nome Completo (Obrigatório)" required>
-            <input type="email" id="cad-email" placeholder="E-mail (Para recuperação)" required>
+            <input type="text" id="cad-nome" placeholder="Nome Completo *" required>
+            <input type="email" id="cad-email" placeholder="E-mail *" required>
             <input type="text" id="cad-unidade" placeholder="Setor / Unidade Escolar">
             
+            <!-- Campo de Login com Verificação -->
+            <input type="text" id="cad-usuario" placeholder="Crie um Nome de Usuário (Login) *" onblur="checarDisponibilidade()" required>
+            
+            <div id="box-sugestoes" style="display: none; text-align: left; margin-bottom: 8px;">
+                <span style="font-size: 9px; color: #d93025;">Usuário em uso. Sugestões:</span>
+                <div id="botoes-sugestao" style="display: flex; gap: 4px; margin-top: 4px;"></div>
+            </div>
+            
             <div class="password-wrapper">
-                <input type="password" id="cad-senha" placeholder="Definir Senha" onkeyup="checarForcaSenha()" required>
-                <button class="btn-eye" onclick="toggleSenha('cad-senha', this)" title="Mostrar/Ocultar Senha">
+                <input type="password" id="cad-senha" placeholder="Definir Senha *" onkeyup="checarForcaSenha()" required>
+                <button class="btn-eye" onclick="toggleSenha('cad-senha', this)">
                     <span class="material-icons">visibility_off</span>
                 </button>
             </div>
             <div id="forca-senha"></div>
             
             <div class="password-wrapper">
-                <input type="password" id="cad-senha-confirma" placeholder="Confirmar Senha" required>
-                <button class="btn-eye" onclick="toggleSenha('cad-senha-confirma', this)" title="Mostrar/Ocultar Senha">
+                <input type="password" id="cad-senha-confirma" placeholder="Confirmar Senha *" required>
+                <button class="btn-eye" onclick="toggleSenha('cad-senha-confirma', this)">
                     <span class="material-icons">visibility_off</span>
                 </button>
             </div>
             
-            <button class="btn-acao btn-verde" onclick="executarCadastro()">Gravar Registro</button>
+            <button class="btn-acao btn-verde" id="btn-cadastrar" onclick="executarCadastro()">Gravar Registro</button>
             <button class="btn-cancelar" onclick="fecharModais()">Cancelar</button>
             
             <div class="link-auxiliar">
@@ -369,10 +375,9 @@
         </div>
     </div>
 
+    <!-- SCRIPT DO SISTEMA -->
     <script>
-        // ======= CONFIGURAÇÃO DA API =======
-        // Cole aqui a URL gerada pelo Google Apps Script
-        const urlAPI = "https://docs.google.com/spreadsheets/d/1vCMc7PnUHlp9u1Jugxzh8eeOmz8WmRd7CSJDBuAhk9U/edit?usp=sharing"; 
+        const urlAPI = "https://script.google.com/macros/s/AKfycbyzmrCSWJTLf91gMDwtFdCLPpVIMQoaIBDJwgDnPPrks_GGpn6L8W6PEKug6C_FHZeUZg/exec"; 
 
         function toggleMenu() { document.getElementById('sidebar').classList.toggle('collapsed'); }
         function abrirModal(id) { document.getElementById(id).style.display = 'flex'; }
@@ -423,14 +428,49 @@
             }
         }
 
-        // ======= ROTINA DE CADASTRO (Apenas simulação visual por enquanto) =======
+        // ======= ROTINA: CHECAR DISPONIBILIDADE DO USUÁRIO =======
+        function checarDisponibilidade() {
+            var usuario = document.getElementById('cad-usuario').value.trim();
+            var box = document.getElementById('box-sugestoes');
+            var botoes = document.getElementById('botoes-sugestao');
+            var campoUsuario = document.getElementById('cad-usuario');
+            
+            if (usuario.length < 3) return; // Mínimo de 3 caracteres
+
+            fetch(urlAPI + "?acao=verificar_usuario&usuario=" + encodeURIComponent(usuario))
+                .then(resposta => resposta.json())
+                .then(dados => {
+                    if (dados.status === "ocupado") {
+                        box.style.display = "block";
+                        campoUsuario.style.borderColor = "#d93025";
+                        botoes.innerHTML = "";
+                        
+                        dados.sugestoes.forEach(sug => {
+                            botoes.innerHTML += `<button onclick="aplicarSugestao('${sug}')" style="background:#fce8e6; border:1px solid #d93025; color:#d93025; font-size:9px; cursor:pointer; padding:2px 4px;">${sug}</button>`;
+                        });
+                    } else {
+                        box.style.display = "none";
+                        campoUsuario.style.borderColor = "#188038"; // Borda verde (OK)
+                    }
+                })
+                .catch(erro => console.error("Erro na verificação de usuário:", erro));
+        }
+
+        function aplicarSugestao(nomeEscolhido) {
+            document.getElementById('cad-usuario').value = nomeEscolhido;
+            document.getElementById('box-sugestoes').style.display = "none";
+            document.getElementById('cad-usuario').style.borderColor = "#188038";
+        }
+
+        // ======= ROTINA DE CADASTRO (Será conectada à API no próximo passo) =======
         function executarCadastro() {
             var nome = document.getElementById('cad-nome').value;
+            var email = document.getElementById('cad-email').value;
+            var usuario = document.getElementById('cad-usuario').value;
             var senha = document.getElementById('cad-senha').value;
             var conf = document.getElementById('cad-senha-confirma').value;
-            var email = document.getElementById('cad-email').value;
 
-            if(nome === "" || senha === "" || conf === "" || email === "") {
+            if(nome === "" || email === "" || usuario === "" || senha === "" || conf === "") {
                 alert("Erro: Preenchimento obrigatório incompleto.");
                 return;
             }
@@ -438,14 +478,14 @@
                 alert("Erro: As senhas não coincidem.");
                 return;
             }
-            alert("Simulação: Usuário " + nome + " seria cadastrado no banco.");
+
+            alert("Simulação: Os dados estão prontos para serem gravados na planilha.");
             alternarParaLogin();
         }
 
         // ======= ROTINA DE RECUPERAÇÃO VIA FETCH =======
         function executarRecuperacao() {
             var email = document.getElementById('recuperar-email').value;
-            
             if(email === "") {
                 alert("Informe o e-mail para recuperar a senha.");
                 return;
@@ -467,7 +507,7 @@
                 })
                 .catch(erro => {
                     btn.innerText = "Enviar Senha";
-                    alert("Erro de conexão. Verifique se a URL da API está correta no código.");
+                    alert("Erro de conexão. Verifique a URL da API.");
                 });
         }
 
@@ -496,17 +536,15 @@
                         document.getElementById('label-nome-gestor').innerText = dados.nome;
                         document.getElementById('painel-subtitulo').innerText = '| Ambiente Seguro';
                         
-                        // Guarda o ID do gestor no navegador para gravar os lançamentos futuros
                         localStorage.setItem('idGestorLogado', dados.id);
-                        
                         mudarSecao('sis-dashboard');
                     } else {
-                        alert("Usuário ou senha incorretos.");
+                        alert("Usuário/E-mail ou senha incorretos.");
                     }
                 })
                 .catch(erro => {
                     btn.innerText = "Conectar";
-                    alert("Erro de conexão. Verifique se a URL da API está correta no código.");
+                    alert("Erro de conexão. Verifique a URL da API.");
                 });
         }
 
