@@ -462,14 +462,16 @@
             document.getElementById('cad-usuario').style.borderColor = "#188038";
         }
 
-        // ======= ROTINA DE CADASTRO (Será conectada à API no próximo passo) =======
+// ======= ROTINA DE CADASTRO REAL =======
         function executarCadastro() {
-            var nome = document.getElementById('cad-nome').value;
-            var email = document.getElementById('cad-email').value;
-            var usuario = document.getElementById('cad-usuario').value;
+            var nome = document.getElementById('cad-nome').value.trim();
+            var email = document.getElementById('cad-email').value.trim();
+            var unidade = document.getElementById('cad-unidade').value.trim();
+            var usuario = document.getElementById('cad-usuario').value.trim();
             var senha = document.getElementById('cad-senha').value;
             var conf = document.getElementById('cad-senha-confirma').value;
 
+            // Validação de preenchimento
             if(nome === "" || email === "" || usuario === "" || senha === "" || conf === "") {
                 alert("Erro: Preenchimento obrigatório incompleto.");
                 return;
@@ -479,8 +481,34 @@
                 return;
             }
 
-            alert("Simulação: Os dados estão prontos para serem gravados na planilha.");
-            alternarParaLogin();
+            var btn = document.getElementById('btn-cadastrar');
+            btn.innerText = "Gravando no sistema...";
+
+            // Monta os parâmetros para enviar à API
+            var parametros = "?acao=cadastrar" + 
+                             "&nome=" + encodeURIComponent(nome) + 
+                             "&email=" + encodeURIComponent(email) + 
+                             "&usuario=" + encodeURIComponent(usuario) + 
+                             "&unidade=" + encodeURIComponent(unidade) + 
+                             "&senha=" + encodeURIComponent(senha);
+
+            // Dispara para o Google Apps Script
+            fetch(urlAPI + parametros)
+                .then(resposta => resposta.json())
+                .then(dados => {
+                    btn.innerText = "Gravar Registro";
+                    
+                    if(dados.status === "sucesso") {
+                        alert("Cadastro realizado com sucesso, " + nome + "! Você já pode fazer login.");
+                        alternarParaLogin();
+                    } else {
+                        alert("Erro: " + dados.mensagem); // Avisa se o e-mail ou usuário já existir
+                    }
+                })
+                .catch(erro => {
+                    btn.innerText = "Gravar Registro";
+                    alert("Erro de conexão ao tentar cadastrar. Verifique a URL da API.");
+                });
         }
 
         // ======= ROTINA DE RECUPERAÇÃO VIA FETCH =======
