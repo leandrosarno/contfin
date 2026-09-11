@@ -382,10 +382,32 @@
         function toggleMenu() { document.getElementById('sidebar').classList.toggle('collapsed'); }
         function abrirModal(id) { document.getElementById(id).style.display = 'flex'; }
         
-        function fecharModais() {
+function fecharModais() {
+            // 1. Esconde as janelas flutuantes
             document.getElementById('modal-login').style.display = 'none';
             document.getElementById('modal-cadastro').style.display = 'none';
             document.getElementById('modal-recuperar').style.display = 'none';
+
+            // 2. Limpa todos os campos de digitação dentro dos modais
+            var inputs = document.querySelectorAll('.modal-box input');
+            inputs.forEach(function(campo) {
+                campo.value = '';
+                campo.style.borderColor = '#aaa'; // Restaura a borda cinza padrão
+            });
+
+            // 3. Reseta os textos de aviso e a caixa de sugestões
+            document.getElementById('forca-senha').innerText = '';
+            document.getElementById('box-sugestoes').style.display = 'none';
+
+            // 4. Retorna todas as senhas para o modo oculto (fecha o "olho")
+            var olhos = document.querySelectorAll('.btn-eye .material-icons');
+            olhos.forEach(function(icone) {
+                icone.innerText = 'visibility_off';
+            });
+            var senhas = document.querySelectorAll('.password-wrapper input');
+            senhas.forEach(function(senha) {
+                senha.type = 'password';
+            });
         }
 
         function alternarParaCadastro() { fecharModais(); abrirModal('modal-cadastro'); }
