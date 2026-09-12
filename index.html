@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SIG-EDU | PRTF e Gestão</title>
+    <title>LS PLUS - SISTEMAS</title>
     
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     
@@ -192,7 +192,7 @@
         
         <div class="topbar-title">
             <span class="material-icons" style="font-size: 16px; color: var(--google-blue);">school</span>
-            SIG-EDU <span id="painel-subtitulo" style="font-size: 10px; color: #666; font-weight: normal;">| Portal Institucional</span>
+            LS PLUS SISTEMAS <span id="painel-subtitulo" style="font-size: 10px; color: #666; font-weight: normal;">| Controle Finnaceiro </span>
         </div>
         
         <div class="topbar-right">
@@ -201,7 +201,7 @@
             </button>
             
             <div class="only-logged-in" style="display: flex; align-items: center; gap: 6px;">
-                <span id="label-nome-gestor" style="font-weight: bold; font-size: 11px;">Gestor</span>
+                <span id="label-nome-gestor" style="font-weight: bold; font-size: 11px;">Nome</span>
                 <button class="btn-top" onclick="fazerLogout()" title="Sair" style="background: #e0e0e0; color: #333;">Sair</button>
             </div>
         </div>
@@ -216,7 +216,7 @@
                 <span class="material-icons">dashboard</span><span class="menu-text">Painel Geral</span>
             </div>
             <div class="menu-item" onclick="mudarSecao('sis-lancamentos')">
-                <span class="material-icons">account_balance_wallet</span><span class="menu-text">Lançamentos PRTF</span>
+                <span class="material-icons">account_balance_wallet</span><span class="menu-text">Lançamentos</span>
             </div>
             <div class="menu-item" onclick="mudarSecao('sis-custos')">
                 <span class="material-icons">receipt_long</span><span class="menu-text">Custos Gerais</span>
@@ -323,7 +323,7 @@
                 <span class="material-icons" style="font-size: 13px; margin-right: 4px;">lock_reset</span> Recuperar Acesso
             </div>
             <p style="font-size: 10px; text-align: left; margin-top: 0;">Informe o e-mail cadastrado. Suas credenciais serão enviadas para a sua caixa de entrada.</p>
-            <label style="font-size: 10px; font-weight: bold; display: block; text-align: left;">E-mail do Gestor:</label>
+            <label style="font-size: 10px; font-weight: bold; display: block; text-align: left;">E-mail:</label>
             <input type="email" id="recuperar-email">
             <button class="btn-acao btn-alerta" id="btn-recuperar" onclick="executarRecuperacao()">Enviar Senha</button>
             <div class="link-auxiliar">
