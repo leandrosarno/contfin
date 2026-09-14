@@ -192,7 +192,7 @@
         
         <div class="topbar-title">
             <span class="material-icons" style="font-size: 16px; color: var(--google-blue);">school</span>
-            CROW SISTEMAS <span id="painel-subtitulo" style="font-size: 10px; color: #666; font-weight: normal;">| Controle Finnaceiro </span>
+            CROW SISTEMAS <span id="painel-subtitulo" style="font-size: 10px; color: #666; font-weight: normal;">| Controle Financeiro </span>
         </div>
         
         <div class="topbar-right">
@@ -322,10 +322,10 @@
             <div class="modal-header" style="background-color: #d93025;">
                 <span class="material-icons" style="font-size: 13px; margin-right: 4px;">lock_reset</span> Recuperar Acesso
             </div>
-            <p style="font-size: 10px; text-align: left; margin-top: 0;">Informe o e-mail cadastrado. Suas credenciais serão enviadas para a sua caixa de entrada.</p>
+            <p style="font-size: 10px; text-align: left; margin-top: 0;">Informe o e-mail cadastrado. Um link seguro será enviado para a sua caixa de entrada.</p>
             <label style="font-size: 10px; font-weight: bold; display: block; text-align: left;">E-mail:</label>
             <input type="email" id="recuperar-email">
-            <button class="btn-acao btn-alerta" id="btn-recuperar" onclick="executarRecuperacao()">Enviar Senha</button>
+            <button class="btn-acao btn-alerta" id="btn-recuperar" onclick="executarRecuperacao()">Enviar Link</button>
             <div class="link-auxiliar">
                 <button onclick="alternarParaLogin()">Voltar para a tela de Login</button>
             </div>
@@ -343,7 +343,6 @@
             <input type="email" id="cad-email" placeholder="E-mail *" required>
             <input type="text" id="cad-unidade" placeholder="Setor / Unidade Escolar">
             
-            <!-- Campo de Login com Verificação -->
             <input type="text" id="cad-usuario" placeholder="Crie um Nome de Usuário (Login) *" onblur="checarDisponibilidade()" required>
             
             <div id="box-sugestoes" style="display: none; text-align: left; margin-bottom: 8px;">
@@ -375,31 +374,73 @@
         </div>
     </div>
 
+    <!-- MODAL DE REDEFINIÇÃO DE SENHA (ABERTO VIA LINK DO E-MAIL) -->
+    <div id="modal-nova-senha" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-header" style="background-color: var(--google-blue);">
+                <span class="material-icons" style="font-size: 13px; margin-right: 4px;">key</span> Criar Nova Senha
+            </div>
+            <p style="font-size: 10px; text-align: left; margin-top: 0;">Digite e confirme sua nova senha de acesso.</p>
+            
+            <!-- Guarda o e-mail da URL silenciosamente -->
+            <input type="hidden" id="token-recuperacao"> 
+            
+            <div class="password-wrapper">
+                <input type="password" id="nova-senha-1" placeholder="Nova Senha *" onkeyup="checarForcaSenhaReset()" required>
+                <button class="btn-eye" onclick="toggleSenha('nova-senha-1', this)">
+                    <span class="material-icons">visibility_off</span>
+                </button>
+            </div>
+            <div id="forca-senha-reset" style="font-size: 9px; text-align: left; margin-bottom: 6px; min-height: 11px;"></div>
+            
+            <div class="password-wrapper">
+                <input type="password" id="nova-senha-2" placeholder="Confirmar Nova Senha *" required>
+                <button class="btn-eye" onclick="toggleSenha('nova-senha-2', this)">
+                    <span class="material-icons">visibility_off</span>
+                </button>
+            </div>
+            
+            <button class="btn-acao btn-azul" id="btn-salvar-senha" onclick="salvarNovaSenha()">Salvar Nova Senha</button>
+            <button class="btn-cancelar" onclick="fecharModais()">Cancelar</button>
+        </div>
+    </div>
+
     <!-- SCRIPT DO SISTEMA -->
     <script>
         const urlAPI = "https://script.google.com/macros/s/AKfycbyzmrCSWJTLf91gMDwtFdCLPpVIMQoaIBDJwgDnPPrks_GGpn6L8W6PEKug6C_FHZeUZg/exec"; 
 
+        // ======= LER A URL PARA ABRIR O MODAL DE RECUPERAÇÃO =======
+        window.onload = function() {
+            var parametrosDaUrl = new URLSearchParams(window.location.search);
+            if (parametrosDaUrl.has('reset_token')) {
+                // Captura o e-mail da URL, guarda no campo oculto e abre a tela de nova senha
+                document.getElementById('token-recuperacao').value = parametrosDaUrl.get('reset_token');
+                abrirModal('modal-nova-senha');
+                
+                // Limpa a URL visualmente para o usuário não recarregar a página com o link ativo
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+        };
+
         function toggleMenu() { document.getElementById('sidebar').classList.toggle('collapsed'); }
         function abrirModal(id) { document.getElementById(id).style.display = 'flex'; }
         
-function fecharModais() {
-            // 1. Esconde as janelas flutuantes
+        function fecharModais() {
             document.getElementById('modal-login').style.display = 'none';
             document.getElementById('modal-cadastro').style.display = 'none';
             document.getElementById('modal-recuperar').style.display = 'none';
+            document.getElementById('modal-nova-senha').style.display = 'none'; // Adicionado
 
-            // 2. Limpa todos os campos de digitação dentro dos modais
             var inputs = document.querySelectorAll('.modal-box input');
             inputs.forEach(function(campo) {
                 campo.value = '';
-                campo.style.borderColor = '#aaa'; // Restaura a borda cinza padrão
+                campo.style.borderColor = '#aaa'; 
             });
 
-            // 3. Reseta os textos de aviso e a caixa de sugestões
             document.getElementById('forca-senha').innerText = '';
+            document.getElementById('forca-senha-reset').innerText = ''; // Adicionado
             document.getElementById('box-sugestoes').style.display = 'none';
 
-            // 4. Retorna todas as senhas para o modo oculto (fecha o "olho")
             var olhos = document.querySelectorAll('.btn-eye .material-icons');
             olhos.forEach(function(icone) {
                 icone.innerText = 'visibility_off';
@@ -450,14 +491,31 @@ function fecharModais() {
             }
         }
 
-        // ======= ROTINA: CHECAR DISPONIBILIDADE DO USUÁRIO =======
+        // Validação idêntica para o modal de redefinição de senha
+        function checarForcaSenhaReset() {
+            var senha = document.getElementById('nova-senha-1').value;
+            var box = document.getElementById('forca-senha-reset');
+            var temNum = /\d/.test(senha);
+            var temLetra = /[a-zA-Z]/.test(senha);
+            
+            if(senha.length === 0) {
+                box.innerText = "";
+            } else if(senha.length < 6 || !temNum || !temLetra) {
+                box.style.color = "#d93025";
+                box.innerText = "Requisito: Min. 6 caracteres (letras e números).";
+            } else {
+                box.style.color = "#188038";
+                box.innerText = "Status: Senha validada.";
+            }
+        }
+
         function checarDisponibilidade() {
             var usuario = document.getElementById('cad-usuario').value.trim();
             var box = document.getElementById('box-sugestoes');
             var botoes = document.getElementById('botoes-sugestao');
             var campoUsuario = document.getElementById('cad-usuario');
             
-            if (usuario.length < 3) return; // Mínimo de 3 caracteres
+            if (usuario.length < 3) return; 
 
             fetch(urlAPI + "?acao=verificar_usuario&usuario=" + encodeURIComponent(usuario))
                 .then(resposta => resposta.json())
@@ -472,7 +530,7 @@ function fecharModais() {
                         });
                     } else {
                         box.style.display = "none";
-                        campoUsuario.style.borderColor = "#188038"; // Borda verde (OK)
+                        campoUsuario.style.borderColor = "#188038"; 
                     }
                 })
                 .catch(erro => console.error("Erro na verificação de usuário:", erro));
@@ -484,7 +542,6 @@ function fecharModais() {
             document.getElementById('cad-usuario').style.borderColor = "#188038";
         }
 
-// ======= ROTINA DE CADASTRO REAL =======
         function executarCadastro() {
             var nome = document.getElementById('cad-nome').value.trim();
             var email = document.getElementById('cad-email').value.trim();
@@ -493,7 +550,6 @@ function fecharModais() {
             var senha = document.getElementById('cad-senha').value;
             var conf = document.getElementById('cad-senha-confirma').value;
 
-            // Validação de preenchimento
             if(nome === "" || email === "" || usuario === "" || senha === "" || conf === "") {
                 alert("Erro: Preenchimento obrigatório incompleto.");
                 return;
@@ -506,7 +562,6 @@ function fecharModais() {
             var btn = document.getElementById('btn-cadastrar');
             btn.innerText = "Gravando no sistema...";
 
-            // Monta os parâmetros para enviar à API
             var parametros = "?acao=cadastrar" + 
                              "&nome=" + encodeURIComponent(nome) + 
                              "&email=" + encodeURIComponent(email) + 
@@ -514,7 +569,6 @@ function fecharModais() {
                              "&unidade=" + encodeURIComponent(unidade) + 
                              "&senha=" + encodeURIComponent(senha);
 
-            // Dispara para o Google Apps Script
             fetch(urlAPI + parametros)
                 .then(resposta => resposta.json())
                 .then(dados => {
@@ -524,7 +578,7 @@ function fecharModais() {
                         alert("Cadastro realizado com sucesso, " + nome + "! Você já pode fazer login.");
                         alternarParaLogin();
                     } else {
-                        alert("Erro: " + dados.mensagem); // Avisa se o e-mail ou usuário já existir
+                        alert("Erro: " + dados.mensagem); 
                     }
                 })
                 .catch(erro => {
@@ -533,7 +587,6 @@ function fecharModais() {
                 });
         }
 
-        // ======= ROTINA DE RECUPERAÇÃO VIA FETCH =======
         function executarRecuperacao() {
             var email = document.getElementById('recuperar-email').value;
             if(email === "") {
@@ -542,26 +595,61 @@ function fecharModais() {
             }
 
             var btn = document.getElementById('btn-recuperar');
-            btn.innerText = "Enviando...";
+            btn.innerText = "Enviando Link...";
 
             fetch(urlAPI + "?acao=recuperar&email=" + encodeURIComponent(email))
                 .then(resposta => resposta.json())
                 .then(dados => {
-                    btn.innerText = "Enviar Senha";
+                    btn.innerText = "Enviar Link";
                     if(dados.status === "enviado") {
-                        alert("As instruções de recuperação foram enviadas para o seu e-mail.");
+                        alert("Um link de recuperação seguro foi enviado para o seu e-mail.");
                         alternarParaLogin();
                     } else {
                         alert("E-mail não localizado no banco de dados.");
                     }
                 })
                 .catch(erro => {
-                    btn.innerText = "Enviar Senha";
+                    btn.innerText = "Enviar Link";
                     alert("Erro de conexão. Verifique a URL da API.");
                 });
         }
 
-        // ======= ROTINA DE LOGIN VIA FETCH =======
+        // ======= ROTINA PARA SALVAR A NOVA SENHA =======
+        function salvarNovaSenha() {
+            var emailToken = document.getElementById('token-recuperacao').value;
+            var senha1 = document.getElementById('nova-senha-1').value;
+            var senha2 = document.getElementById('nova-senha-2').value;
+
+            if (senha1 === "" || senha2 === "") {
+                alert("Preencha as duas senhas.");
+                return;
+            }
+            if (senha1 !== senha2) {
+                alert("As senhas digitadas não coincidem.");
+                return;
+            }
+
+            var btn = document.getElementById('btn-salvar-senha');
+            btn.innerText = "Gravando...";
+
+            fetch(urlAPI + "?acao=salvar_nova_senha&email_token=" + encodeURIComponent(emailToken) + "&nova_senha=" + encodeURIComponent(senha1))
+                .then(resposta => resposta.json())
+                .then(dados => {
+                    btn.innerText = "Salvar Nova Senha";
+                    if (dados.status === "sucesso") {
+                        alert("Sua senha foi alterada com sucesso! Você já pode acessar o sistema.");
+                        fecharModais();
+                        abrirModal('modal-login'); // Volta pro login para ele testar a senha nova
+                    } else {
+                        alert("Ocorreu um erro ao atualizar sua senha. Solicite um novo link.");
+                    }
+                })
+                .catch(erro => {
+                    btn.innerText = "Salvar Nova Senha";
+                    alert("Erro de conexão. Verifique sua rede.");
+                });
+        }
+
         function executarLogin() {
             var usuario = document.getElementById('login-usuario').value;
             var senha = document.getElementById('login-senha').value;
