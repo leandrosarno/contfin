@@ -407,7 +407,137 @@
 
     <!-- SCRIPT DO SISTEMA -->
     <script>
-        const urlAPI = "https://script.google.com/macros/s/AKfycbyzmrCSWJTLf91gMDwtFdCLPpVIMQoaIBDJwgDnPPrks_GGpn6L8W6PEKug6C_FHZeUZg/exec"; 
+        const urlAPI = "https://script.google.com/macros/s/AKfycbyzmrCSWJTLf91gMDwtFdCLPpVIMQoaIBDJwgDnPPrks_GGpn6L8W6PEKug6C_FHZeUZg/exec";
+
+        // ================================================================
+        // CAMADA DE COMUNICAÇÃO ROBUSTA COM O GOOGLE APPS SCRIPT
+        // ================================================================
+        // O GitHub hospeda apenas o HTML. A conexão com a planilha é feita
+        // pelo Web App do Google Apps Script indicado em urlAPI.
+        const API_CONFIG = {
+            timeout: 20000,       // 20 segundos por tentativa
+            tentativas: 3,        // até 3 tentativas em falhas transitórias
+            atrasoInicial: 800    // espera entre tentativas: 0,8s / 1,6s / 3,2s
+        };
+
+        let apiOcupada = false;
+
+        function esperar(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        function montarUrlAPI(acao, parametros = {}) {
+            const url = new URL(urlAPI);
+            url.searchParams.set("acao", acao);
+
+            Object.keys(parametros).forEach(chave => {
+                const valor = parametros[chave];
+                if (valor !== undefined && valor !== null) {
+                    url.searchParams.set(chave, valor);
+                }
+            });
+
+            return url.toString();
+        }
+
+        async function chamarAPI(acao, parametros = {}, opcoes = {}) {
+            const tentativas = opcoes.tentativas || API_CONFIG.tentativas;
+            const timeout = opcoes.timeout || API_CONFIG.timeout;
+            const url = montarUrlAPI(acao, parametros);
+
+            let ultimoErro = null;
+
+            for (let tentativa = 1; tentativa <= tentativas; tentativa++) {
+                const controlador = new AbortController();
+                const temporizador = setTimeout(() => controlador.abort(), timeout);
+
+                try {
+                    const resposta = await fetch(url, {
+                        method: "GET",
+                        mode: "cors",
+                        cache: "no-store",
+                        credentials: "omit",
+                        redirect: "follow",
+                        signal: controlador.signal,
+                        headers: {
+                            "Accept": "application/json"
+                        }
+                    });
+
+                    clearTimeout(temporizador);
+
+                    if (!resposta.ok) {
+                        throw new Error("Servidor HTTP " + resposta.status);
+                    }
+
+                    const texto = await resposta.text();
+
+                    if (!texto || !texto.trim()) {
+                        throw new Error("O servidor retornou uma resposta vazia.");
+                    }
+
+                    let dados;
+                    try {
+                        dados = JSON.parse(texto);
+                    } catch (erroJSON) {
+                        console.error("Resposta recebida do Apps Script:", texto);
+                        throw new Error("O servidor não retornou um JSON válido.");
+                    }
+
+                    return dados;
+
+                } catch (erro) {
+                    clearTimeout(temporizador);
+                    ultimoErro = erro;
+
+                    const foiTimeout = erro && erro.name === "AbortError";
+                    const mensagem = foiTimeout
+                        ? "tempo de resposta excedido"
+                        : (erro.message || "falha de comunicação");
+
+                    console.warn(
+                        "Comunicação com Apps Script - tentativa " +
+                        tentativa + "/" + tentativas + ": " + mensagem
+                    );
+
+                    if (tentativa < tentativas) {
+                        await esperar(API_CONFIG.atrasoInicial * Math.pow(2, tentativa - 1));
+                    }
+                }
+            }
+
+            throw ultimoErro || new Error("Não foi possível comunicar com o servidor.");
+        }
+
+        function mensagemErroConexao(erro) {
+            if (erro && erro.name === "AbortError") {
+                return "O servidor demorou para responder. Tente novamente em alguns segundos.";
+            }
+
+            const msg = (erro && erro.message) ? erro.message : "";
+
+            if (msg.includes("JSON")) {
+                return "O Google Apps Script respondeu de forma inesperada. Verifique a implantação do Web App.";
+            }
+
+            if (msg.includes("HTTP")) {
+                return "O servidor do sistema retornou um erro. Verifique a implantação do Google Apps Script.";
+            }
+
+            return "Não foi possível comunicar com o sistema neste momento. A conexão será tentada novamente quando você repetir a operação.";
+        }
+
+        // Teste silencioso da API. Não bloqueia a abertura do sistema.
+        async function verificarAPI() {
+            try {
+                await chamarAPI("ping", {}, { tentativas: 1, timeout: 10000 });
+                console.info("CROW SISTEMAS: comunicação com o Apps Script disponível.");
+                return true;
+            } catch (erro) {
+                console.warn("CROW SISTEMAS: API ainda não respondeu ao teste inicial.", erro);
+                return false;
+            }
+        }
 
         // ======= LER A URL PARA ABRIR O MODAL DE RECUPERAÇÃO =======
         window.onload = function() {
@@ -420,6 +550,10 @@
                 // Limpa a URL visualmente para o usuário não recarregar a página com o link ativo
                 window.history.replaceState({}, document.title, window.location.pathname);
             }
+
+            // Teste silencioso. A página abre normalmente mesmo que o Google
+            // esteja momentaneamente lento; as operações usam retry individual.
+            verificarAPI();
         };
 
         function toggleMenu() { document.getElementById('sidebar').classList.toggle('collapsed'); }
@@ -514,26 +648,36 @@
             var box = document.getElementById('box-sugestoes');
             var botoes = document.getElementById('botoes-sugestao');
             var campoUsuario = document.getElementById('cad-usuario');
-            
-            if (usuario.length < 3) return; 
 
-            fetch(urlAPI + "?acao=verificar_usuario&usuario=" + encodeURIComponent(usuario))
-                .then(resposta => resposta.json())
-                .then(dados => {
+            if (usuario.length < 3) return;
+
+            chamarAPI("verificar_usuario", { usuario: usuario })
+                .then(function(dados) {
                     if (dados.status === "ocupado") {
                         box.style.display = "block";
                         campoUsuario.style.borderColor = "#d93025";
                         botoes.innerHTML = "";
-                        
-                        dados.sugestoes.forEach(sug => {
-                            botoes.innerHTML += `<button onclick="aplicarSugestao('${sug}')" style="background:#fce8e6; border:1px solid #d93025; color:#d93025; font-size:9px; cursor:pointer; padding:2px 4px;">${sug}</button>`;
+
+                        (dados.sugestoes || []).forEach(function(sug) {
+                            var botao = document.createElement("button");
+                            botao.type = "button";
+                            botao.textContent = sug;
+                            botao.onclick = function() { aplicarSugestao(sug); };
+                            botao.style.cssText =
+                                "background:#fce8e6;border:1px solid #d93025;" +
+                                "color:#d93025;font-size:9px;cursor:pointer;padding:2px 4px;";
+                            botoes.appendChild(botao);
                         });
                     } else {
                         box.style.display = "none";
-                        campoUsuario.style.borderColor = "#188038"; 
+                        campoUsuario.style.borderColor = "#188038";
                     }
                 })
-                .catch(erro => console.error("Erro na verificação de usuário:", erro));
+                .catch(function(erro) {
+                    console.error("Erro na verificação de usuário:", erro);
+                    box.style.display = "none";
+                    campoUsuario.style.borderColor = "#aaa";
+                });
         }
 
         function aplicarSugestao(nomeEscolhido) {
@@ -542,7 +686,7 @@
             document.getElementById('cad-usuario').style.borderColor = "#188038";
         }
 
-        function executarCadastro() {
+        async function executarCadastro() {
             var nome = document.getElementById('cad-nome').value.trim();
             var email = document.getElementById('cad-email').value.trim();
             var unidade = document.getElementById('cad-unidade').value.trim();
@@ -554,68 +698,82 @@
                 alert("Erro: Preenchimento obrigatório incompleto.");
                 return;
             }
+
             if(senha !== conf) {
                 alert("Erro: As senhas não coincidem.");
                 return;
             }
 
             var btn = document.getElementById('btn-cadastrar');
+            if (apiOcupada) return;
+
+            apiOcupada = true;
+            btn.disabled = true;
             btn.innerText = "Gravando no sistema...";
 
-            var parametros = "?acao=cadastrar" + 
-                             "&nome=" + encodeURIComponent(nome) + 
-                             "&email=" + encodeURIComponent(email) + 
-                             "&usuario=" + encodeURIComponent(usuario) + 
-                             "&unidade=" + encodeURIComponent(unidade) + 
-                             "&senha=" + encodeURIComponent(senha);
-
-            fetch(urlAPI + parametros)
-                .then(resposta => resposta.json())
-                .then(dados => {
-                    btn.innerText = "Gravar Registro";
-                    
-                    if(dados.status === "sucesso") {
-                        alert("Cadastro realizado com sucesso, " + nome + "! Você já pode fazer login.");
-                        alternarParaLogin();
-                    } else {
-                        alert("Erro: " + dados.mensagem); 
-                    }
-                })
-                .catch(erro => {
-                    btn.innerText = "Gravar Registro";
-                    alert("Erro de conexão ao tentar cadastrar. Verifique a URL da API.");
+            try {
+                var dados = await chamarAPI("cadastrar", {
+                    nome: nome,
+                    email: email,
+                    usuario: usuario,
+                    unidade: unidade,
+                    senha: senha
                 });
+
+                if(dados.status === "sucesso") {
+                    alert("Cadastro realizado com sucesso, " + nome + "! Você já pode fazer login.");
+                    alternarParaLogin();
+                } else {
+                    alert("Erro: " + (dados.mensagem || "Não foi possível concluir o cadastro."));
+                }
+
+            } catch (erro) {
+                console.error("Erro no cadastro:", erro);
+                alert(mensagemErroConexao(erro));
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "Gravar Registro";
+                apiOcupada = false;
+            }
         }
 
-        function executarRecuperacao() {
-            var email = document.getElementById('recuperar-email').value;
+        async function executarRecuperacao() {
+            var email = document.getElementById('recuperar-email').value.trim();
+
             if(email === "") {
                 alert("Informe o e-mail para recuperar a senha.");
                 return;
             }
 
             var btn = document.getElementById('btn-recuperar');
+            if (apiOcupada) return;
+
+            apiOcupada = true;
+            btn.disabled = true;
             btn.innerText = "Enviando Link...";
 
-            fetch(urlAPI + "?acao=recuperar&email=" + encodeURIComponent(email))
-                .then(resposta => resposta.json())
-                .then(dados => {
-                    btn.innerText = "Enviar Link";
-                    if(dados.status === "enviado") {
-                        alert("Um link de recuperação seguro foi enviado para o seu e-mail.");
-                        alternarParaLogin();
-                    } else {
-                        alert("E-mail não localizado no banco de dados.");
-                    }
-                })
-                .catch(erro => {
-                    btn.innerText = "Enviar Link";
-                    alert("Erro de conexão. Verifique a URL da API.");
-                });
+            try {
+                var dados = await chamarAPI("recuperar", { email: email });
+
+                if(dados.status === "enviado") {
+                    alert("Um link de recuperação seguro foi enviado para o seu e-mail.");
+                    alternarParaLogin();
+                } else {
+                    alert(dados.mensagem || "E-mail não localizado no banco de dados.");
+                }
+
+            } catch (erro) {
+                console.error("Erro na recuperação:", erro);
+                alert(mensagemErroConexao(erro));
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "Enviar Link";
+                apiOcupada = false;
+            }
         }
 
         // ======= ROTINA PARA SALVAR A NOVA SENHA =======
-        function salvarNovaSenha() {
+        async function salvarNovaSenha() {
             var emailToken = document.getElementById('token-recuperacao').value;
             var senha1 = document.getElementById('nova-senha-1').value;
             var senha2 = document.getElementById('nova-senha-2').value;
@@ -624,34 +782,45 @@
                 alert("Preencha as duas senhas.");
                 return;
             }
+
             if (senha1 !== senha2) {
                 alert("As senhas digitadas não coincidem.");
                 return;
             }
 
             var btn = document.getElementById('btn-salvar-senha');
+            if (apiOcupada) return;
+
+            apiOcupada = true;
+            btn.disabled = true;
             btn.innerText = "Gravando...";
 
-            fetch(urlAPI + "?acao=salvar_nova_senha&email_token=" + encodeURIComponent(emailToken) + "&nova_senha=" + encodeURIComponent(senha1))
-                .then(resposta => resposta.json())
-                .then(dados => {
-                    btn.innerText = "Salvar Nova Senha";
-                    if (dados.status === "sucesso") {
-                        alert("Sua senha foi alterada com sucesso! Você já pode acessar o sistema.");
-                        fecharModais();
-                        abrirModal('modal-login'); // Volta pro login para ele testar a senha nova
-                    } else {
-                        alert("Ocorreu um erro ao atualizar sua senha. Solicite um novo link.");
-                    }
-                })
-                .catch(erro => {
-                    btn.innerText = "Salvar Nova Senha";
-                    alert("Erro de conexão. Verifique sua rede.");
+            try {
+                var dados = await chamarAPI("salvar_nova_senha", {
+                    email_token: emailToken,
+                    nova_senha: senha1
                 });
+
+                if (dados.status === "sucesso") {
+                    alert("Sua senha foi alterada com sucesso! Você já pode acessar o sistema.");
+                    fecharModais();
+                    abrirModal('modal-login');
+                } else {
+                    alert(dados.mensagem || "Ocorreu um erro ao atualizar sua senha. Solicite um novo link.");
+                }
+
+            } catch (erro) {
+                console.error("Erro ao salvar nova senha:", erro);
+                alert(mensagemErroConexao(erro));
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "Salvar Nova Senha";
+                apiOcupada = false;
+            }
         }
 
-        function executarLogin() {
-            var usuario = document.getElementById('login-usuario').value;
+        async function executarLogin() {
+            var usuario = document.getElementById('login-usuario').value.trim();
             var senha = document.getElementById('login-senha').value;
 
             if(usuario === "" || senha === "") {
@@ -660,30 +829,40 @@
             }
 
             var btn = document.getElementById('btn-login');
+            if (apiOcupada) return;
+
+            apiOcupada = true;
+            btn.disabled = true;
             btn.innerText = "Conectando...";
 
-            fetch(urlAPI + "?acao=login&usuario=" + encodeURIComponent(usuario) + "&senha=" + encodeURIComponent(senha))
-                .then(resposta => resposta.json())
-                .then(dados => {
-                    btn.innerText = "Conectar";
-                    if(dados.status === "sucesso") {
-                        fecharModais();
-                        document.body.classList.remove('logged-out');
-                        document.body.classList.add('logged-in');
-                        
-                        document.getElementById('label-nome-gestor').innerText = dados.nome;
-                        document.getElementById('painel-subtitulo').innerText = '| Ambiente Seguro';
-                        
-                        localStorage.setItem('idGestorLogado', dados.id);
-                        mudarSecao('sis-dashboard');
-                    } else {
-                        alert("Usuário/E-mail ou senha incorretos.");
-                    }
-                })
-                .catch(erro => {
-                    btn.innerText = "Conectar";
-                    alert("Erro de conexão. Verifique a URL da API.");
+            try {
+                var dados = await chamarAPI("login", {
+                    usuario: usuario,
+                    senha: senha
                 });
+
+                if(dados.status === "sucesso") {
+                    fecharModais();
+                    document.body.classList.remove('logged-out');
+                    document.body.classList.add('logged-in');
+
+                    document.getElementById('label-nome-gestor').innerText = dados.nome;
+                    document.getElementById('painel-subtitulo').innerText = '| Ambiente Seguro';
+
+                    localStorage.setItem('idGestorLogado', dados.id);
+                    mudarSecao('sis-dashboard');
+                } else {
+                    alert(dados.mensagem || "Usuário/E-mail ou senha incorretos.");
+                }
+
+            } catch (erro) {
+                console.error("Erro no login:", erro);
+                alert(mensagemErroConexao(erro));
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "Conectar";
+                apiOcupada = false;
+            }
         }
 
         function fazerLogout() {
